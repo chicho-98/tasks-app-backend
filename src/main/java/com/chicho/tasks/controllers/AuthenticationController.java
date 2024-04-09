@@ -1,9 +1,6 @@
 package com.chicho.tasks.controllers;
 
-import com.chicho.tasks.model.user.LoginRequestDTO;
-import com.chicho.tasks.model.user.LoginResponseDTO;
-import com.chicho.tasks.model.user.RegisterDTO;
-import com.chicho.tasks.model.user.User;
+import com.chicho.tasks.model.user.*;
 import com.chicho.tasks.services.TokenService;
 import com.chicho.tasks.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +28,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequestDTO data) {
+    public ResponseEntity login(@RequestBody AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
@@ -39,12 +36,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RegisterDTO data) {
+    public ResponseEntity register(@RequestBody AuthenticationDTO data) {
         if (userService.getUserByEmail(data.email()) != null) {
             return ResponseEntity.badRequest().build();
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User newUser = new User(data.email(), encryptedPassword, data.role());
+        User newUser = new User(data.email(), encryptedPassword, UserRole.USER);
         userService.createUser(newUser);
         return ResponseEntity.ok().build();
     }
