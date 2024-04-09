@@ -1,7 +1,7 @@
 package com.chicho.tasks.security;
 
-import com.chicho.tasks.repositories.UserRepository;
 import com.chicho.tasks.services.TokenService;
+import com.chicho.tasks.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,13 +17,13 @@ import java.io.IOException;
 @Component
 public class JWTSecurityFilter extends OncePerRequestFilter {
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
 
-    private UserRepository userRepository;
+    private final UserService userService;
 
-    public JWTSecurityFilter(TokenService tokenService, UserRepository userRepository) {
+    public JWTSecurityFilter(TokenService tokenService, UserService userService) {
         this.tokenService = tokenService;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class JWTSecurityFilter extends OncePerRequestFilter {
         var token = recoverToken(request);
         if (token != null) {
             String email = tokenService.getSubjectFromToken(token);
-            UserDetails user = userRepository.findUserByEmail(email);
+            UserDetails user = userService.getUserByEmail(email);
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

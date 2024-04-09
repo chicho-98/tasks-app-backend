@@ -1,22 +1,22 @@
-package com.chicho.tasks.services;
+package com.chicho.tasks.security;
 
-import com.chicho.tasks.repositories.UserRepository;
+import com.chicho.tasks.services.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthorizationService implements UserDetailsService {
+public class UserDetailsServiceImplementation implements UserDetailsService {
 
-    private UserRepository userRepository;
+    private final UserService userService;
 
-    public AuthorizationService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailsServiceImplementation(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserByEmail(username);
+        return userService.getUserByEmail(username);
     }
 }

@@ -10,7 +10,7 @@ import com.chicho.tasks.repositories.TaskRepository;
 @Service
 public class TaskService {
 
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
