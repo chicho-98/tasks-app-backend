@@ -1,9 +1,11 @@
 package com.chicho.tasks.controllers;
 
 import com.chicho.tasks.model.user.AuthenticationDTO;
+import com.chicho.tasks.model.user.LoginResponseDTO;
 import com.chicho.tasks.model.user.RegisterDTO;
 import com.chicho.tasks.model.user.User;
 import com.chicho.tasks.repositories.UserRepository;
+import com.chicho.tasks.services.TokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,21 +18,24 @@ public class AuthenticationController {
 
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
+    private TokenService tokenService;
 
     public AuthenticationController(
             AuthenticationManager authenticationManager,
-            UserRepository userRepository
+            UserRepository userRepository,
+            TokenService tokenService
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
-
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     @PostMapping("/register")
