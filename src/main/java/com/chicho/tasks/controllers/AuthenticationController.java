@@ -28,7 +28,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthenticationDTO data) {
+    public ResponseEntity<?> login(@RequestBody AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = authenticationManager.authenticate(usernamePassword);
         var token = tokenService.generateToken((User) auth.getPrincipal());
@@ -36,13 +36,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody AuthenticationDTO data) {
+    public ResponseEntity<?> register(@RequestBody AuthenticationDTO data) {
         if (userService.getUserByEmail(data.email()) != null) {
             return ResponseEntity.badRequest().build();
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
         User newUser = new User(data.email(), encryptedPassword, UserRole.USER);
-        userService.createUser(newUser);
+        userService.saveUser(newUser);
         return ResponseEntity.ok().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.chicho.tasks.model.user;
 
+import com.chicho.tasks.model.Task;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,10 +30,22 @@ public class User implements UserDetails {
 
     private UserRole role;
 
+    @Getter
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id")
+    private List<Task> tasks;
+
     public User(String email, String password, UserRole role) {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public void addTask(Task task) {
+        this.tasks.add(task);
     }
 
     @Override

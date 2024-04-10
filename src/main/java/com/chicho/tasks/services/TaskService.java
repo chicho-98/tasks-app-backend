@@ -2,6 +2,7 @@ package com.chicho.tasks.services;
 
 import java.util.List;
 
+import com.chicho.tasks.model.user.User;
 import org.springframework.stereotype.Service;
 
 import com.chicho.tasks.model.Task;
@@ -11,13 +12,22 @@ import com.chicho.tasks.repositories.TaskRepository;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserService userService;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, UserService userService) {
         this.taskRepository = taskRepository;
+        this.userService = userService;
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<Task> getAllTasksByEmail(String email) {
+        User user = (User) userService.getUserByEmail(email);
+        return user.getTasks();
+    }
+
+    public void addTask(String email, Task task) {
+        User user = (User) userService.getUserByEmail(email);
+        user.addTask(task);
+        userService.saveUser(user);
     }
 
     public Task createTask(Task task) {

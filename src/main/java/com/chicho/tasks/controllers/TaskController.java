@@ -2,6 +2,11 @@ package com.chicho.tasks.controllers;
 
 import java.util.List;
 
+import com.chicho.tasks.model.user.User;
+import com.chicho.tasks.services.TokenService;
+import com.chicho.tasks.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,20 +23,26 @@ import com.chicho.tasks.services.TaskService;
 @RequestMapping("api/tasks")
 public class TaskController {
 
-    private TaskService taskService;
+    private final TaskService taskService;
+    private final TokenService tokenService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, TokenService tokenService) {
         this.taskService = taskService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping("")
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public List<Task> getAllTasks(HttpServletRequest request) {
+        String token = tokenService.recoverTokenFromRequest(request);
+        String email = tokenService.getSubjectFromToken(token);
+        return taskService.getAllTasksByEmail(email);
     }
 
     @PostMapping("")
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
+    public void createTask(@RequestBody Task task, HttpServletRequest request) {
+        String token = tokenService.recoverTokenFromRequest(request);
+        String email = tokenService.getSubjectFromToken(token);
+        taskService.addTask(email, task);
     }
 
     @PutMapping("/{id}")

@@ -28,7 +28,7 @@ public class JWTSecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var token = recoverToken(request);
+        var token = tokenService.recoverTokenFromRequest(request);
         if (token != null) {
             String email = tokenService.getSubjectFromToken(token);
             UserDetails user = userService.getUserByEmail(email);
@@ -36,11 +36,5 @@ public class JWTSecurityFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String recoverToken(HttpServletRequest request) {
-        var authHeader = request.getHeader("Authorization");
-        if (authHeader == null) return null;
-        return authHeader.replace("Bearer ", "");
     }
 }

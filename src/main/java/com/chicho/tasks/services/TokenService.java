@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.chicho.tasks.model.user.User;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,10 @@ public class TokenService {
         }
     }
 
+    private Instant generateExpirationDate() {
+        return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
+    }
+
     public String getSubjectFromToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -44,7 +49,9 @@ public class TokenService {
         }
     }
 
-    private Instant generateExpirationDate() {
-        return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
+    public String recoverTokenFromRequest(HttpServletRequest request) {
+        var authHeader = request.getHeader("Authorization");
+        if (authHeader == null) return null;
+        return authHeader.replace("Bearer ", "");
     }
 }

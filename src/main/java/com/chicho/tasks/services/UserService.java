@@ -1,5 +1,6 @@
 package com.chicho.tasks.services;
 
+import com.chicho.tasks.model.Task;
 import com.chicho.tasks.model.user.User;
 import com.chicho.tasks.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +25,7 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
-    public UserDetails createUser(User newUser) {
+    public UserDetails saveUser(User newUser) {
         return userRepository.save(newUser);
     }
 }
